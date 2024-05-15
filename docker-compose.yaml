@@ -1,0 +1,39 @@
+name: shoes-app
+services:
+  pg-admin:
+    container_name: pg-admin
+    image: dpage/pgadmin4
+    ports:
+      - "80:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: user-name@domain-name.com
+      PGADMIN_DEFAULT_PASSWORD: strong-password
+  shop-db:
+    container_name: shop-db
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: online_store_microservices
+  shop-service:
+    container_name: shop-service
+    ports:
+      - "8080:8080"
+    build:
+      dockerfile: docker-files/spring-boot/Dockerfile
+      args:
+        JAR_FILE: shop-service/target/shop-service-1.0-SNAPSHOT-exec.jar
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://shop-db/online_store_microservices
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=password
+    depends_on:
+      - shop-db
+  rabbitmq:
+    image: rabbitmq:3.9.11-management-alpine
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    depends_on:
+      - shop-service

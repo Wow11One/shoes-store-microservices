@@ -1,0 +1,28 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: shop-service
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  datasource:
+    url: jdbc:postgresql://localhost:5432/online_store_microservices
+    username: postgres
+    password: Reserved2003
+    driver-class-name: org.postgresql.Driver
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+upload:
+  path: shop-service/src/main/resources/static/img
+nova:
+  post:
+    url: https://api.novaposhta.ua/v2.0/json/
+
+cloudinary:
+  cloud_name: dbkgbcqcf
+  api_key: 463961816584397
+  api_secret: VXmTJHTHnvMvW3zg9VsgD0aki9w
