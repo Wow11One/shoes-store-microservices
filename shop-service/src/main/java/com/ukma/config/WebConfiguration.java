@@ -30,10 +30,10 @@ public class WebConfiguration implements WebMvcConfigurer {
         return new RestTemplate();
     }
 
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**").allowedMethods("*");
-    }
+  //  @Override
+  //  public void addCorsMappings(CorsRegistry registry) {
+  //      registry.addMapping("/**").allowedMethods("*");
+  //  }
 
     @Bean
     public Cloudinary cloudinary() {

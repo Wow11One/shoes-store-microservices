@@ -11,6 +11,7 @@ import com.ukma.dto.order.OrderListDto;
 import com.ukma.dto.order.OrderShoesSizeDto;
 import com.ukma.dto.shoes.ShoesListItemDto;
 import com.ukma.dto.shoes.ShoesSizeDto;
+import com.ukma.dto.user.UserDto;
 import com.ukma.entity.Order;
 import com.ukma.entity.OrderShoesSizes;
 import com.ukma.entity.Order_;
@@ -52,10 +53,10 @@ public class OrderService {
     ObjectMapper objectMapper;
     ShoesMapper shoesMapper;
     AmqpTemplate amqpTemplate;
+    UserService userService;
 
     @Transactional
-    public OrderDto create(Long userId,
-                           String userName,
+    public OrderDto create(String userName,
                            String userSurname,
                            String comment,
                            DeliveryType deliveryType,
@@ -74,7 +75,7 @@ public class OrderService {
                     userSurname,
                     comment,
                     addressNode.get("address").textValue(),
-                    userId
+                    1L
             );
         } else {
             order = new Order(
@@ -87,7 +88,7 @@ public class OrderService {
                     addressNode.get("postRegion").textValue(),
                     addressNode.get("postCity").textValue(),
                     addressNode.get("postDepartment").textValue(),
-                    userId
+                    1L
             );
         }
 
@@ -161,6 +162,10 @@ public class OrderService {
         orderShoesSizeDto.setShoesSizeDto(shoesSizeDto);
 
         return orderShoesSizeDto;
+    }
+
+    private UserDto findUserById(Long id) {
+        return null;
     }
 
     private String createEmailContent(String receiver, String username, List<EmailBasketItemDto> basketItems)

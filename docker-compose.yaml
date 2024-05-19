@@ -58,6 +58,8 @@ services:
       dockerfile: docker-files/micronaut/Dockerfile
     depends_on:
       - users-db
+    ports:
+      - "8090:8090"
   users-db:
     container_name: users-db
     image: postgres:15-alpine

@@ -21,8 +21,8 @@ public class AuthService {
         this.userRepository = userRepository;
     }
 
-    public AccountDto findById(Long id) {
-        User user = userRepository.findById(id).orElseThrow();
+    public AccountDto findByUsername(String username) {
+        User user = userRepository.findByUsername(username).orElseThrow();
         return new AccountDto(user.getUsername(), user.getRole().toString());
     }
 

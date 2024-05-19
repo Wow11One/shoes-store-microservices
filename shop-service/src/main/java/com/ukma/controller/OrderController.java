@@ -29,8 +29,7 @@ public class OrderController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public OrderDto create(@RequestParam("userId") Long userId,
-                           @RequestParam("userName") String userName,
+    public OrderDto create(@RequestParam("userName") String userName,
                            @RequestParam("userSurname") String userSurname,
                            @RequestParam(value = "comment", required = false)
                            String comment,
@@ -39,7 +38,6 @@ public class OrderController {
                            @RequestParam("address") String addressJson,
                            @RequestParam("basket") String basketJson) throws Exception {
         return orderService.create(
-                userId,
                 userName,
                 userSurname,
                 comment,

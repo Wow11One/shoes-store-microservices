@@ -125,6 +125,22 @@
             <version>2.0.2</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>io.micronaut.servlet</groupId>
+            <artifactId>micronaut-servlet-core</artifactId>
+            <version>4.5.0</version>
+        </dependency>
+        <dependency>
+            <groupId>io.micronaut.servlet</groupId>
+            <artifactId>micronaut-servlet-engine</artifactId>
+            <version>4.7.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
     </dependencies>
     <build>
         <plugins>
