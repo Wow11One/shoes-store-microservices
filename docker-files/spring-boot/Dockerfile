@@ -8,8 +8,6 @@ RUN java -Djarmode=layertools -jar application.jar extract --destination extract
 
 FROM eclipse-temurin:21.0.2_13-jdk-jammy
 
-RUN addgroup spring-boot-group && adduser --ingroup spring-boot-group spring-boot
-USER spring-boot:spring-boot-group
 VOLUME /tmp
 WORKDIR /application
 

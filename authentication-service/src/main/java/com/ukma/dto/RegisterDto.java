@@ -9,6 +9,7 @@ import jakarta.validation.constraints.NotBlank;
 import java.io.Serializable;
 
 @Serdeable
+@Introspected
 public class RegisterDto implements Serializable {
 
     @Email

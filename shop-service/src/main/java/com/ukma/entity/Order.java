@@ -22,6 +22,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -100,6 +101,7 @@ public class Order {
         this.postCity = postCity;
         this.postDepartment = postDepartment;
         this.userId = userId;
+        this.orderShoesSizesList = new ArrayList<>();
     }
 
     public Order(OrderState orderState,

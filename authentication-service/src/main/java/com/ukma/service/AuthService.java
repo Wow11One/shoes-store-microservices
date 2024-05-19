@@ -21,9 +21,14 @@ public class AuthService {
         this.userRepository = userRepository;
     }
 
+    public AccountDto findById(Long id) {
+        User user = userRepository.findById(id).orElseThrow();
+        return new AccountDto(user.getUsername(), user.getRole().toString());
+    }
+
     public AccountDto register(RegisterDto registerDto) {
         String encodedPassword = passwordEncoderService.encode(registerDto.getPassword());
-        User user = new User(registerDto.getUsername(), encodedPassword, UserRole.USER);
+        User user = new User(registerDto.getUsername(), encodedPassword, UserRole.ADMIN);
         userRepository.save(user);
 
         return new AccountDto(registerDto.getUsername(), UserRole.USER.toString());

@@ -31,4 +31,13 @@ public class MailDto {
   public void setBasketItems(List<EmailBasketItemDto> basketItems) {
     this.basketItems = basketItems;
   }
+
+  @Override
+  public String toString() {
+    return "MailDto{" +
+      "receiver='" + receiver + '\'' +
+      ", username='" + username + '\'' +
+      ", basketItems=" + basketItems +
+      '}';
+  }
 }

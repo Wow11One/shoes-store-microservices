@@ -1,7 +1,10 @@
 package com.ukma.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ukma.dto.mail.EmailBasketItemDto;
+import com.ukma.dto.mail.MailDto;
 import com.ukma.dto.order.OrderDetailedDto;
 import com.ukma.dto.order.OrderDto;
 import com.ukma.dto.order.OrderListDto;
@@ -89,9 +92,14 @@ public class OrderService {
         }
 
         orderRepository.save(order);
-        addShoesToOrder(basketJson, order);
+        List<EmailBasketItemDto> basketItems = addShoesToOrder(basketJson, order);
 
-        amqpTemplate.convertAndSend("mail.queue","hello vertx");
+        String emailContent = createEmailContent(
+                "chotkiypaca349@gmail.com",
+                "volodymyr",
+                basketItems
+        );
+        amqpTemplate.convertAndSend("mail.queue", emailContent);
 
         return orderMapper.toDto(order);
     }
@@ -100,9 +108,9 @@ public class OrderService {
     public OrderListDto findAll(Integer limit,
                                 Integer page,
                                 String search,
-                                OrderState state) throws Exception {
+                                OrderState state) {
         Specification<Order> specification = buildSpecification(search, state);
-        Pageable pageable = PageRequest.of(page - 1, limit, Sort.by(Order_.ID));
+        Pageable pageable = PageRequest.of(page - 1, limit, Sort.by(Order_.CREATED_AT));
 
         Page<Order> orderPage = orderRepository.findAll(specification, pageable);
         List<OrderDto> resultList = orderPage.getContent()
@@ -118,13 +126,17 @@ public class OrderService {
         Order order = orderRepository.findById(id).orElseThrow();
 
         OrderDetailedDto detailedDto = orderMapper.toDetailedDto(order);
-        List<OrderShoesSizeDto> orderShoesSizes = order.getOrderShoesSizesList()
-                .stream()
-                .map(this::mapToOrderShoesSizeDto)
-                .toList();
+        List<OrderShoesSizeDto> orderShoesSizes = getOrderShoesSizes(order);
         detailedDto.setOrderShoesSizes(orderShoesSizes);
 
         return detailedDto;
+    }
+
+    private List<OrderShoesSizeDto> getOrderShoesSizes(Order order) {
+        return order.getOrderShoesSizesList()
+                .stream()
+                .map(this::mapToOrderShoesSizeDto)
+                .toList();
     }
 
     @Transactional
@@ -151,6 +163,17 @@ public class OrderService {
         return orderShoesSizeDto;
     }
 
+    private String createEmailContent(String receiver, String username, List<EmailBasketItemDto> basketItems)
+            throws JsonProcessingException {
+        MailDto mailDto = new MailDto(
+                receiver,
+                username,
+                basketItems
+        );
+
+        return objectMapper.writeValueAsString(mailDto);
+    }
+
     private Specification<Order> buildSpecification(String search, OrderState state) {
         List<Specification<Order>> specifications = new ArrayList<>();
 
@@ -165,13 +188,28 @@ public class OrderService {
     }
 
 
-    private void addShoesToOrder(String basket, Order order) throws Exception {
+    private List<EmailBasketItemDto> addShoesToOrder(String basket, Order order) throws Exception {
+        List<EmailBasketItemDto> basketItems = new ArrayList<>();
         JsonNode basketNode = objectMapper.readTree(basket);
+
         basketNode.forEach(node -> {
             ShoesSize shoesSizeReference = shoesSizeRepository
-                    .getReferenceById(node.get("id").asLong());
+                    .findById(node.get("id").asLong()).orElseThrow();
             int amount = node.get("amount").asInt();
+            Shoes shoes = shoesSizeReference.getShoes();
+
             orderShoesSizesRepository.save(new OrderShoesSizes(amount, order, shoesSizeReference));
+            basketItems.add(
+                    new EmailBasketItemDto(
+                            shoes.getImage(),
+                            shoes.getName(),
+                            amount,
+                            shoesSizeReference.getSizeValue(),
+                            shoes.getPrice()
+                    )
+            );
         });
+
+        return basketItems;
     }
 }
