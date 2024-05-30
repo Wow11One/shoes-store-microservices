@@ -3,4 +3,9 @@ server:
 spring:
   application:
     name: eureka-server
-  eure
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+    service-url:
+      defaultZone: http://eureka-service:8761/eureka

@@ -1,0 +1,46 @@
+datasources:
+  default:
+    connection-timeout: 1000000
+    driver-class-name: org.postgresql.Driver
+    initialization-fail-timeout: 1000000
+    jdbc-url: jdbc:postgresql://users-db:5433/users
+    password: password
+    username: postgres
+
+jpa:
+  default:
+    properties:
+      hibernate:
+        hbm2ddl:
+          auto: create
+micronaut:
+  application:
+    name: authentication-service
+  security:
+    authentication: bearer
+    endpoints:
+      login:
+        path: /api/auth/login
+    token:
+      jwt:
+        signatures:
+          secret:
+            generator:
+              secret: ${JWT_GENERATOR_SIGNATURE_SECRET:aglAizu+v9SFbLqUt7wpcpzMH1VMmvuYnTOaBSQT23o=}
+  server:
+    port: 8090
+    cors:
+      localhost-pass-through: true
+      single-header: true
+      enabled: false
+      configurations:
+        ui:
+          allowed-origins: "*"
+eureka:
+  client:
+    registration:
+      enabled: true
+    default-zone: eureka-service:8761
+    registration.retry-count: 10
+    registration.retry-delay: 5s
+

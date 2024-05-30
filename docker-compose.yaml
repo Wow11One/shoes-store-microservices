@@ -1,0 +1,79 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3.9.8-management-alpine
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+      - ./definitions.json:/etc/rabbitmq/definitions.json:ro
+  mail-service:
+    container_name: mail-service
+    build:
+      dockerfile: docker-files/vertx/Dockerfile
+    depends_on:
+      - rabbitmq
+  eureka-service:
+    container_name: eureka-service
+    build:
+      dockerfile: docker-files/spring-boot/Dockerfile
+      args:
+        JAR_FILE: eureka-server/target/eureka-server-1.0-SNAPSHOT-exec.jar
+    ports:
+      - "8761:8761"
+  shop-service:
+    container_name: shop-service
+    build:
+      dockerfile: docker-files/spring-boot/Dockerfile
+      args:
+        JAR_FILE: shop-service/target/shop-service-1.0-SNAPSHOT-exec.jar
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://shop-db/online_store_microservices
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=password
+      - SPRING_RABBITMQ_HOST=rabbitmq
+    depends_on:
+      - rabbitmq
+      - eureka-service
+      - shop-db
+  pg-admin:
+    container_name: pg-admin
+    image: dpage/pgadmin4
+    ports:
+      - "80:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: user-name@domain-name.com
+      PGADMIN_DEFAULT_PASSWORD: strong-password
+  shop-db:
+    container_name: shop-db
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: online_store_microservices
+  authentication-service:
+    container_name: authentication-service
+    build:
+      dockerfile: docker-files/micronaut/Dockerfile
+    depends_on:
+      - users-db
+    ports:
+      - "8090:8090"
+  users-db:
+    container_name: users-db
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: users
+      PGPORT: 5433
+  api-gateway:
+    container_name: api-gateway
+    ports:
+      - "8765:8765"
+    build:
+      dockerfile: docker-files/spring-boot/Dockerfile
+      args:
+        JAR_FILE: api-gateway/target/api-gateway-0.0.1-SNAPSHOT-exec.jar
+

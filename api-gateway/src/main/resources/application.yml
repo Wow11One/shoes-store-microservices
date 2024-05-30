@@ -1,0 +1,22 @@
+server:
+  port: 8765
+spring:
+  cloud:
+    gateway:
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+  application:
+    name: api-gateway
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-service:8761/eureka
+    eureka-server-read-timeout-seconds: 60
